@@ -14,15 +14,40 @@ usará depois.
 
 ## Como rodar
 
-### 1. Banco de dados
+### 1. Primeira configuração
+
+Instale o MySQL somente se ele ainda não estiver instalado:
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p < create-db.sql
+sudo apt-get update
+sudo apt-get install -y mysql-server
+```
+
+Inicie o serviço e crie as tabelas do projeto:
+
+```bash
+sudo service mysql start
+mysql -h 127.0.0.1 -P 3306 -u root -p < create-db.sql (Só não primeira config)
 ```
 
 O uso de `-h 127.0.0.1` força a conexão TCP e evita problemas de permissão no
-socket local. Se aparecer `Table 'users' already exists`, o banco já foi
-inicializado e não é necessário executar o script novamente.
+socket local. O comando `mysql ... < create-db.sql` lê o arquivo
+`create-db.sql` e cria o banco `tcc` e suas tabelas.
+
+**Esse comando ainda precisa ser executado nas próximas vezes?** Não. Ele só é
+necessário na primeira configuração ou em um banco novo. Se aparecer
+`ERROR 1050 (42S01): Table 'users' already exists`, significa que as tabelas já
+foram criadas. Nesse caso, não apague nem recrie o banco: prossiga para iniciar
+o backend.
+
+Configure o ambiente do backend uma única vez:
+
+```bash
+cp .env.example .env
+```
+
+Edite `.env` e confira `DB_HOST=127.0.0.1`, a senha correta em `DB_PASSWORD` e
+um valor para `JWT_SECRET`.
 
 Para confirmar que as tabelas estão disponíveis, execute:
 
@@ -38,20 +63,30 @@ já existe; não é necessário recriá-la.
 ### 2. Backend
 
 ```bash
-npm install
-cp .env.example .env   # preencha DB_PASSWORD com a senha do MySQL
-npm run dev             # sobe em http://localhost:3000
+npm install                 # somente na primeira configuração
+npm run dev              # sobe em http://localhost:3000
 ```
-
-O arquivo `.env` deve usar `DB_HOST=127.0.0.1`, a senha correta em
-`DB_PASSWORD` e um valor para `JWT_SECRET`.
 
 ### 3. Frontend (em outro terminal)
 
 ```bash
 cd web
-npm install
-npm run dev              # sobe em http://localhost:5173, com proxy de /api para o backend
+npm install                 # somente na primeira configuração
+```
+
+Depois, para desenvolvimento, inicie o backend na raiz e o frontend em outro
+terminal:
+
+Terminal 1, na raiz do projeto:
+
+```bash
+npm run dev
+```
+
+Terminal 2, na pasta `web/`:
+
+```bash
+npm run dev              # sobe em http://localhost:5173, com proxy de /api
 ```
 
 Abra `http://localhost:5173`. Crie uma conta, cadastre uma piscina e registre
@@ -70,7 +105,8 @@ automática, use os dois terminais da seção anterior e abra `http://localhost:
 
 ### Próxima vez
 
-Com o MySQL já instalado e o banco já criado, basta executar:
+Com o MySQL já instalado, o banco já criado e o arquivo `.env` já configurado,
+basta executar:
 
 Terminal 1, na raiz do projeto:
 
@@ -86,6 +122,11 @@ npm run dev
 ```
 
 Abra `http://localhost:5173`.
+
+Não é necessário executar novamente `apt-get install`, `npm install`,
+`create-db.sql` ou `cp .env.example .env`. O cadastro de usuários, piscinas e
+medições fica salvo no MySQL, não no Git. Se `users already exists` aparecer,
+isso confirma que o banco já contém essa tabela.
 
 ## Estrutura
 
