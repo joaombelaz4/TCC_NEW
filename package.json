@@ -1,0 +1,22 @@
+{
+  "name": "aquamonitor",
+  "version": "1.0.0",
+  "description": "Sistema de monitoramento de pH para piscinas",
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "lint": "npx eslint server/**/*.js src/**/*.js",
+    "db:init": "mysql -u \"$DB_USER\" -p\"$DB_PASSWORD\" -h \"$DB_HOST\" < create-db.sql"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.4",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
