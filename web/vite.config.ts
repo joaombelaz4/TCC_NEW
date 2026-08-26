@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    outDir: '../public',
+  },
   server: {
     proxy: {
       // Em desenvolvimento, o Vite roda em uma porta separada do Express.
