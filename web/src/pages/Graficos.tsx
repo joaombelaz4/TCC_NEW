@@ -11,12 +11,12 @@ import type { Reading } from '../lib/types';
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   const ph = payload[0].value;
-  const color = ph < 7.2 ? '#ef4444' : ph > 7.6 ? '#f59e0b' : '#22d3ee';
+  const color = ph < 7.2 ? '#ef4444' : ph > 7.6 ? '#f59e0b' : 'var(--accent)';
   return (
-    <div style={{ background: '#0d1b2e', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, padding: '10px 14px', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#cdd9ee' }}>
-      <div style={{ color: '#5d7fa0', marginBottom: 4 }}>{label}</div>
+    <div style={{ background: 'var(--card)', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, padding: '10px 14px', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: 'var(--card-foreground)' }}>
+      <div style={{ color: 'var(--muted-foreground)', marginBottom: 4 }}>{label}</div>
       <div style={{ color, fontWeight: 600, fontSize: 16 }}>pH {ph.toFixed(2)}</div>
-      <div style={{ color: '#5d7fa0', fontSize: 11, marginTop: 2 }}>
+      <div style={{ color: 'var(--muted-foreground)', fontSize: 11, marginTop: 2 }}>
         {ph < 7.2 ? '⚠ Abaixo do ideal' : ph > 7.6 ? '⚠ Acima do ideal' : '✓ Dentro do intervalo ideal'}
       </div>
     </div>
@@ -73,8 +73,8 @@ export default function Graficos() {
   const stats = [
     { label: 'Mínimo', value: Math.min(...allData.map(d => d.ph)).toFixed(2), color: '#ef4444' },
     { label: 'Máximo', value: Math.max(...allData.map(d => d.ph)).toFixed(2), color: '#f59e0b' },
-    { label: 'Média', value: avg.toFixed(2), color: '#22d3ee' },
-    { label: 'Desvio padrão', value: Math.sqrt(allData.reduce((s, d) => s + (d.ph - avg) ** 2, 0) / allData.length).toFixed(3), color: '#06b6d4' },
+    { label: 'Média', value: avg.toFixed(2), color: 'var(--accent)' },
+    { label: 'Desvio padrão', value: Math.sqrt(allData.reduce((s, d) => s + (d.ph - avg) ** 2, 0) / allData.length).toFixed(3), color: 'var(--primary)' },
   ];
 
   return (
@@ -84,7 +84,7 @@ export default function Graficos() {
           {views.map(v => (
             <button key={v.id} onClick={() => setView(v.id)}
               className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: view === v.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: view === v.id ? '#22d3ee' : '#5d7fa0', border: view === v.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
+              style={{ background: view === v.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: view === v.id ? 'var(--accent)' : 'var(--muted-foreground)', border: view === v.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
               {v.label}
             </button>
           ))}
@@ -106,8 +106,8 @@ export default function Graficos() {
           </div>
           {view === 'linha' && (
             <div className="flex gap-4">
-              {[{ color: '#ef4444', label: 'pH < 7.2' }, { color: '#22d3ee', label: 'Ideal' }, { color: '#f59e0b', label: 'pH > 7.6' }].map(({ color, label }) => (
-                <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: '#5d7fa0' }}>
+              {[{ color: '#ef4444', label: 'pH < 7.2' }, { color: 'var(--accent)', label: 'Ideal' }, { color: '#f59e0b', label: 'pH > 7.6' }].map(({ color, label }) => (
+                <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
                   <div className="w-3 h-0.5 rounded" style={{ background: color }} />{label}
                 </div>
               ))}
@@ -120,22 +120,22 @@ export default function Graficos() {
             <LineChart data={allData} margin={{ top: 4, right: 16, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,182,212,0.07)" />
               <ReferenceArea y1={7.2} y2={7.6} fill="rgba(34,211,238,0.04)" fillOpacity={1} />
-              <XAxis dataKey="time" tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} interval={Math.max(0, Math.floor(allData.length / 6))} />
-              <YAxis domain={[6.7, 8.1]} tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(1)} />
+              <XAxis dataKey="time" tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} interval={Math.max(0, Math.floor(allData.length / 6))} />
+              <YAxis domain={[6.7, 8.1]} tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(1)} />
               <Tooltip content={<CustomTooltip />} />
               <ReferenceLine y={7.2} stroke="rgba(239,68,68,0.5)" strokeDasharray="5 3" />
               <ReferenceLine y={7.6} stroke="rgba(245,158,11,0.5)" strokeDasharray="5 3" />
               <Line
                 type="monotone"
                 dataKey="ph"
-                stroke="#06b6d4"
+                stroke="var(--primary)"
                 strokeWidth={2.5}
                 dot={props => {
                   const { cx, cy, payload } = props;
-                  const color = payload.ph < 7.2 ? '#ef4444' : payload.ph > 7.6 ? '#f59e0b' : '#22d3ee';
-                  return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill={color} stroke="#060d1a" strokeWidth={1.5} />;
+                  const color = payload.ph < 7.2 ? '#ef4444' : payload.ph > 7.6 ? '#f59e0b' : 'var(--accent)';
+                  return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill={color} stroke="var(--background)" strokeWidth={1.5} />;
                 }}
-                activeDot={{ r: 6, fill: '#06b6d4' }}
+                activeDot={{ r: 6, fill: 'var(--primary)' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -143,14 +143,14 @@ export default function Graficos() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={deviationData} margin={{ top: 4, right: 16, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,182,212,0.07)" />
-              <XAxis dataKey="time" tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} interval={Math.max(0, Math.floor(deviationData.length / 6))} />
-              <YAxis tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => (v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2))} />
+              <XAxis dataKey="time" tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} interval={Math.max(0, Math.floor(deviationData.length / 6))} />
+              <YAxis tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => (v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2))} />
               <Tooltip
                 formatter={v => [`${Number(v) > 0 ? '+' : ''}${Number(v).toFixed(3)} pH`, 'Desvio']}
-                contentStyle={{ background: '#0d1b2e', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#cdd9ee' }}
+                contentStyle={{ background: 'var(--card)', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: 'var(--card-foreground)' }}
               />
               <ReferenceLine y={0} stroke="rgba(34,211,238,0.4)" />
-              <Bar dataKey="deviation" radius={[3, 3, 0, 0]} fill="#06b6d4" />
+              <Bar dataKey="deviation" radius={[3, 3, 0, 0]} fill="var(--primary)" />
             </BarChart>
           </ResponsiveContainer>
         )}

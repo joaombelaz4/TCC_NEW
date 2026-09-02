@@ -38,9 +38,9 @@ export default function Login() {
         <div className="flex flex-col items-center mb-6">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.35)' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C8.5 2 5 7 5 12s3.5 10 7 10 7-5 7-10S15.5 2 12 2z" stroke="#06b6d4" strokeWidth="1.5" />
-              <path d="M5 12h14" stroke="#06b6d4" strokeWidth="1.5" strokeLinecap="round" />
-              <circle cx="12" cy="12" r="2" fill="#06b6d4" />
+              <path d="M12 2C8.5 2 5 7 5 12s3.5 10 7 10 7-5 7-10S15.5 2 12 2z" stroke="var(--primary)" strokeWidth="1.5" />
+              <path d="M5 12h14" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="12" cy="12" r="2" fill="var(--primary)" />
             </svg>
           </div>
           <h1 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>AquaMonitor</h1>

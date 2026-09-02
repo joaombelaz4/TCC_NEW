@@ -69,9 +69,9 @@ export default function Configuracoes() {
   if (loading) return null;
 
   return (
-    <div className="p-6 max-w-2xl space-y-6">
+    <div className="w-full min-h-full p-6 md:p-8 space-y-8">
       <Section title="Limites de pH e cloro" hint="Definem a faixa ideal usada para classificar cada medição e gerar alertas.">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
           {FIELDS.map(f => (
             <Field key={f.key} label={f.label} value={values[f.key] ?? ''} onChange={v => update(f.key, v)} hint={f.hint} />
           ))}
@@ -91,14 +91,14 @@ export default function Configuracoes() {
           className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-60"
           style={{
             background: saved ? 'rgba(34,211,238,0.15)' : 'rgba(6,182,212,0.9)',
-            color: saved ? '#22d3ee' : '#020d14',
+            color: saved ? 'var(--accent)' : 'var(--primary-foreground)',
             border: saved ? '1px solid rgba(34,211,238,0.4)' : '1px solid transparent',
           }}
         >
           {saving ? 'Salvando…' : saved ? '✓ Configurações salvas' : 'Salvar configurações'}
         </button>
         {saved && (
-          <span className="text-xs" style={{ color: '#22d3ee', fontFamily: "'JetBrains Mono', monospace" }}>
+          <span className="text-xs" style={{ color: 'var(--accent)', fontFamily: "'JetBrains Mono', monospace" }}>
             Os novos limites serão usados a partir da próxima medição registrada.
           </span>
         )}

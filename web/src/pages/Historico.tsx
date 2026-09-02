@@ -7,7 +7,7 @@ import type { Reading } from '../lib/types';
 type Filter = 'all' | 'ok' | 'warn' | 'danger';
 
 const statusLabel: Record<string, string> = { ok: 'Ideal', warn: 'Atenção', danger: 'Crítico' };
-const statusColor: Record<string, string> = { ok: '#22d3ee', warn: '#f59e0b', danger: '#ef4444' };
+const statusColor: Record<string, string> = { ok: 'var(--accent)', warn: '#f59e0b', danger: '#ef4444' };
 
 export default function Historico() {
   const { selectedPool } = usePools();
@@ -55,7 +55,7 @@ export default function Historico() {
               className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
               style={{
                 background: filter === f.id ? 'rgba(6,182,212,0.15)' : 'transparent',
-                color: filter === f.id ? '#22d3ee' : '#5d7fa0',
+                color: filter === f.id ? 'var(--accent)' : 'var(--muted-foreground)',
                 border: filter === f.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent',
               }}
             >
@@ -67,7 +67,7 @@ export default function Historico() {
         <button
           onClick={() => setSort(s => (s === 'desc' ? 'asc' : 'desc'))}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs transition-all"
-          style={{ background: 'var(--card)', border: '1px solid var(--border)', color: '#5d7fa0' }}
+          style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
         >
           {sort === 'desc' ? '↓' : '↑'} {sort === 'desc' ? 'Mais recente' : 'Mais antigo'}
         </button>

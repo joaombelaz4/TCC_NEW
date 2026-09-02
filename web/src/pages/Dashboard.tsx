@@ -26,10 +26,10 @@ function StatCard({ label, value, sub, accent }: { label: string; value: string;
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   const ph = payload[0].value;
-  const color = ph < 7.2 ? '#ef4444' : ph > 7.6 ? '#f59e0b' : '#22d3ee';
+  const color = ph < 7.2 ? '#ef4444' : ph > 7.6 ? '#f59e0b' : 'var(--accent)';
   return (
-    <div style={{ background: '#0d1b2e', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, padding: '10px 14px', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#cdd9ee' }}>
-      <div style={{ color: '#5d7fa0', marginBottom: 4 }}>{label}</div>
+    <div style={{ background: 'var(--card)', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 8, padding: '10px 14px', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: 'var(--card-foreground)' }}>
+      <div style={{ color: 'var(--muted-foreground)', marginBottom: 4 }}>{label}</div>
       <div style={{ color, fontWeight: 600, fontSize: 16 }}>pH {ph.toFixed(2)}</div>
     </div>
   );
@@ -110,7 +110,7 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
             <button
               onClick={() => setReadingModalOpen(true)}
               className="w-full mt-4 py-2 rounded-lg text-xs font-semibold"
-              style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.3)', color: '#22d3ee' }}
+              style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.3)', color: 'var(--accent)' }}
             >
               + Registrar medição
             </button>
@@ -132,15 +132,15 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
         {/* Stats + gráfico */}
         <div className="flex flex-col gap-4 min-w-0">
           <div className="grid grid-cols-3 gap-4">
-            <StatCard label="Média (leituras)" value={avgPh} sub="pH médio registrado" accent="#22d3ee" />
-            <StatCard label="Leituras OK" value={`${totalOk}`} sub={`de ${history.length} totais`} accent="#22d3ee" />
-            <StatCard label="Alertas" value={`${totalAlerts}`} sub="no histórico" accent={totalAlerts > 0 ? '#f59e0b' : '#22d3ee'} />
+            <StatCard label="Média (leituras)" value={avgPh} sub="pH médio registrado" accent="var(--accent)" />
+            <StatCard label="Leituras OK" value={`${totalOk}`} sub={`de ${history.length} totais`} accent="var(--accent)" />
+            <StatCard label="Alertas" value={`${totalAlerts}`} sub="no histórico" accent={totalAlerts > 0 ? '#f59e0b' : 'var(--accent)'} />
           </div>
 
           <div className="rounded-xl p-5 flex-1" style={{ background: 'var(--card)', border: '1px solid var(--border)', minHeight: 220 }}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>Evolução pH — últimas leituras</span>
-              <button className="text-xs underline" style={{ color: '#5d7fa0' }} onClick={() => onNavigate('graficos')}>Ver completo</button>
+              <button className="text-xs underline" style={{ color: 'var(--muted-foreground)' }} onClick={() => onNavigate('graficos')}>Ver completo</button>
             </div>
             {loadingData ? null : chartData.length === 0 ? (
               <EmptyState title="Sem leituras suficientes para montar o gráfico." hint="Registre pelo menos uma medição para ver a evolução aqui." />
@@ -149,28 +149,28 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
                 <ResponsiveContainer width="100%" height={160}>
                   <LineChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,182,212,0.07)" />
-                    <XAxis dataKey="time" tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[6.8, 8.0]} tick={{ fill: '#5d7fa0', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(1)} />
+                    <XAxis dataKey="time" tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[6.8, 8.0]} tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(1)} />
                     <Tooltip content={<CustomTooltip />} />
                     <ReferenceLine y={7.2} stroke="rgba(239,68,68,0.4)" strokeDasharray="4 2" />
                     <ReferenceLine y={7.6} stroke="rgba(245,158,11,0.4)" strokeDasharray="4 2" />
                     <Line
                       type="monotone"
                       dataKey="ph"
-                      stroke="#06b6d4"
+                      stroke="var(--primary)"
                       strokeWidth={2}
                       dot={props => {
                         const { cx, cy, payload } = props;
-                        const color = payload.ph < 7.2 ? '#ef4444' : payload.ph > 7.6 ? '#f59e0b' : '#22d3ee';
+                        const color = payload.ph < 7.2 ? '#ef4444' : payload.ph > 7.6 ? '#f59e0b' : 'var(--accent)';
                         return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={3.5} fill={color} stroke="none" />;
                       }}
-                      activeDot={{ r: 5, fill: '#06b6d4' }}
+                      activeDot={{ r: 5, fill: 'var(--primary)' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
                 <div className="flex gap-4 mt-3 flex-wrap">
                   {[{ color: 'rgba(239,68,68,0.5)', label: 'pH < 7.2 (baixo)' }, { color: 'rgba(34,211,238,0.5)', label: '7.2–7.6 (ideal)' }, { color: 'rgba(245,158,11,0.5)', label: 'pH > 7.6 (elevado)' }].map(({ color, label }) => (
-                    <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: '#5d7fa0' }}>
+                    <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
                       <div className="w-3 h-0.5 rounded" style={{ background: color }} />{label}
                     </div>
                   ))}
@@ -185,14 +185,14 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
         <div className="rounded-xl p-5" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>Últimas medições</span>
-            <button className="text-xs underline" style={{ color: '#5d7fa0' }} onClick={() => onNavigate('historico')}>Ver histórico</button>
+            <button className="text-xs underline" style={{ color: 'var(--muted-foreground)' }} onClick={() => onNavigate('historico')}>Ver histórico</button>
           </div>
           {loadingData ? null : history.length === 0 ? (
             <EmptyState title="Nenhuma leitura registrada ainda." />
           ) : (
             <div className="space-y-1">
               {history.slice(0, 7).map((r, i) => {
-                const color = r.status === 'ok' ? '#22d3ee' : r.status === 'warn' ? '#f59e0b' : '#ef4444';
+                const color = r.status === 'ok' ? 'var(--accent)' : r.status === 'warn' ? '#f59e0b' : '#ef4444';
                 const d = new Date(r.recordedAt);
                 return (
                   <div key={i} className="flex items-center justify-between py-2 px-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -213,14 +213,14 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
         <div className="rounded-xl p-5" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>Alertas recentes</span>
-            <button className="text-xs underline" style={{ color: '#5d7fa0' }} onClick={() => onNavigate('alertas')}>Ver todos</button>
+            <button className="text-xs underline" style={{ color: 'var(--muted-foreground)' }} onClick={() => onNavigate('alertas')}>Ver todos</button>
           </div>
           {loadingData ? null : alerts.length === 0 ? (
             <EmptyState title="Nenhum alerta para esta piscina." hint="Alertas aparecem aqui quando uma medição sai da faixa ideal." />
           ) : (
             <div className="space-y-2">
               {alerts.slice(0, 4).map(a => {
-                const color = a.type === 'danger' ? '#ef4444' : a.type === 'warn' ? '#f59e0b' : '#06b6d4';
+                const color = a.type === 'danger' ? '#ef4444' : a.type === 'warn' ? '#f59e0b' : 'var(--primary)';
                 const bg = a.type === 'danger' ? 'rgba(239,68,68,0.07)' : a.type === 'warn' ? 'rgba(245,158,11,0.07)' : 'rgba(6,182,212,0.07)';
                 return (
                   <div key={a.id} className="flex gap-3 p-3 rounded-lg" style={{ background: bg, border: `1px solid ${color}22` }}>

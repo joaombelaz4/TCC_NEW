@@ -60,6 +60,46 @@ poolsRouter.post('/', async (req, res) => {
   }
 });
 
+// PUT /api/pools/:id — atualiza somente uma piscina do usuário autenticado.
+poolsRouter.put('/:id', async (req, res) => {
+  const poolId = Number(req.params.id);
+  if (!poolId) return res.status(400).json({ error: 'Id de piscina inválido.' });
+
+  const errors = validatePool(req.body);
+  if (errors.length) return res.status(400).json({ errors });
+
+  const name = req.body.name.trim();
+  const size = typeof req.body.size === 'string' && req.body.size.trim() ? req.body.size.trim() : null;
+
+  try {
+    const pool = await findOwnedPool(poolId, req.userId);
+    if (!pool) return res.status(404).json({ error: 'Piscina não encontrada.' });
+
+    await db.query('UPDATE pools SET name = ?, size = ? WHERE id = ? AND user_id = ?', [name, size, poolId, req.userId]);
+    res.json(mapPool(await findOwnedPool(poolId, req.userId)));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Falha ao atualizar a piscina.' });
+  }
+});
+
+// DELETE /api/pools/:id — remove a piscina e seus dados relacionados.
+poolsRouter.delete('/:id', async (req, res) => {
+  const poolId = Number(req.params.id);
+  if (!poolId) return res.status(400).json({ error: 'Id de piscina inválido.' });
+
+  try {
+    const pool = await findOwnedPool(poolId, req.userId);
+    if (!pool) return res.status(404).json({ error: 'Piscina não encontrada.' });
+
+    await db.query('DELETE FROM pools WHERE id = ? AND user_id = ?', [poolId, req.userId]);
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Falha ao excluir a piscina.' });
+  }
+});
+
 // GET /api/pools/:id — detalhe de uma piscina específica do usuário.
 poolsRouter.get('/:id', async (req, res) => {
   const poolId = Number(req.params.id);

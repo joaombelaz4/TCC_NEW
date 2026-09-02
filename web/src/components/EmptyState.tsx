@@ -8,7 +8,7 @@ interface Props {
 export default function EmptyState({ title, hint, action }: Props) {
   return (
     <div className="flex flex-col items-center justify-center text-center gap-2 py-10 px-4">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5d7fa0" strokeWidth="1.5">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" strokeWidth="1.5">
         <circle cx="12" cy="12" r="9" />
         <path d="M9 10h.01M15 10h.01" strokeLinecap="round" />
         <path d="M8.5 15c1-1 2.2-1.5 3.5-1.5s2.5.5 3.5 1.5" strokeLinecap="round" />

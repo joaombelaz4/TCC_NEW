@@ -7,12 +7,12 @@ function getPhStatus(ph: number): PhStatus {
 }
 
 const statusConfig = {
-  normal: { color: "#22d3ee", bg: "rgba(34,211,238,0.1)", label: "Ideal", ring: "rgba(34,211,238,0.35)" },
+  normal: { color: "var(--accent)", bg: "rgba(34,211,238,0.1)", label: "Ideal", ring: "rgba(34,211,238,0.35)" },
   high: { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", label: "Elevado", ring: "rgba(245,158,11,0.35)" },
   low: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", label: "Baixo", ring: "rgba(239,68,68,0.35)" },
-  loading: { color: "#5d7fa0", bg: "rgba(93,127,160,0.1)", label: "Carregando", ring: "rgba(93,127,160,0.2)" },
+  loading: { color: "var(--muted-foreground)", bg: "rgba(93,127,160,0.1)", label: "Carregando", ring: "rgba(93,127,160,0.2)" },
   error: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", label: "Erro", ring: "rgba(239,68,68,0.35)" },
-  empty: { color: "#5d7fa0", bg: "rgba(93,127,160,0.1)", label: "Sem leitura", ring: "rgba(93,127,160,0.2)" },
+  empty: { color: "var(--muted-foreground)", bg: "rgba(93,127,160,0.1)", label: "Sem leitura", ring: "rgba(93,127,160,0.2)" },
 };
 
 interface Props {
@@ -91,7 +91,7 @@ export default function PhGauge({ ph, state }: Props) {
             style={{
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: "2.6rem",
-              color: state ? "#5d7fa0" : cfg.color,
+              color: state ? "var(--muted-foreground)" : cfg.color,
               letterSpacing: "-0.02em",
             }}
           >
@@ -114,7 +114,7 @@ export default function PhGauge({ ph, state }: Props) {
       {/* Scale labels */}
       <div className="flex justify-between w-full mt-3 px-2">
         {[6.0, 7.0, 7.2, 7.6, 8.0, 9.0].map((v) => (
-          <span key={v} className="text-xs" style={{ color: "#5d7fa0", fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}>
+          <span key={v} className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}>
             {v.toFixed(1)}
           </span>
         ))}

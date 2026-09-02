@@ -3,10 +3,10 @@ import Modal from './Modal';
 import { usePools } from '../context/PoolContext';
 import { ApiError } from '../context/AuthContext';
 
-export default function NewPoolModal({ onClose }: { onClose: () => void }) {
-  const { createPool } = usePools();
-  const [name, setName] = useState('');
-  const [size, setSize] = useState('');
+export default function NewPoolModal({ onClose, pool }: { onClose: () => void; pool?: { id: number; name: string; size: string | null } }) {
+  const { createPool, updatePool } = usePools();
+  const [name, setName] = useState(pool?.name ?? '');
+  const [size, setSize] = useState(pool?.size ?? '');
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -15,7 +15,8 @@ export default function NewPoolModal({ onClose }: { onClose: () => void }) {
     setErrors([]);
     setSubmitting(true);
     try {
-      await createPool(name, size || undefined);
+      if (pool) await updatePool(pool.id, name, size || undefined);
+      else await createPool(name, size || undefined);
       onClose();
     } catch (err) {
       setErrors(err instanceof ApiError ? (err.errors ?? [err.message]) : ['Não foi possível cadastrar a piscina.']);
@@ -25,7 +26,7 @@ export default function NewPoolModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Modal title="Cadastrar piscina" onClose={onClose}>
+    <Modal title={pool ? 'Editar piscina' : 'Cadastrar piscina'} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
           Nome da piscina
@@ -62,7 +63,7 @@ export default function NewPoolModal({ onClose }: { onClose: () => void }) {
           className="mt-1 py-2.5 rounded-lg font-semibold text-sm disabled:opacity-60"
           style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
         >
-          {submitting ? 'Salvando…' : 'Cadastrar piscina'}
+          {submitting ? 'Salvando…' : pool ? 'Salvar alterações' : 'Cadastrar piscina'}
         </button>
       </form>
     </Modal>

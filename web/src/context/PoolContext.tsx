@@ -10,6 +10,8 @@ interface PoolContextValue {
   selectedPool: Pool | null;
   selectPool: (id: number) => void;
   createPool: (name: string, size?: string) => Promise<Pool>;
+  updatePool: (id: number, name: string, size?: string) => Promise<Pool>;
+  deletePool: (id: number) => Promise<void>;
   addReading: (poolId: number, ph: number, cl: number, temp: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -52,6 +54,18 @@ export function PoolProvider({ children }: { children: ReactNode }) {
     return pool;
   }
 
+  async function updatePool(id: number, name: string, size?: string) {
+    const pool = await api.put<Pool>(`/pools/${id}`, { name, size });
+    setPools(prev => prev.map(current => (current.id === id ? pool : current)));
+    return pool;
+  }
+
+  async function deletePool(id: number) {
+    await api.delete(`/pools/${id}`);
+    setPools(prev => prev.filter(pool => pool.id !== id));
+    setSelectedPoolId(prev => (prev === id ? null : prev));
+  }
+
   async function addReading(poolId: number, ph: number, cl: number, temp: number) {
     const updated = await api.post<Pool>(`/pools/${poolId}/readings`, { ph, cl, temp });
     setPools(prev => prev.map(p => (p.id === updated.id ? updated : p)));
@@ -61,7 +75,7 @@ export function PoolProvider({ children }: { children: ReactNode }) {
 
   return (
     <PoolContext.Provider
-      value={{ pools, loading, selectedPoolId, selectedPool, selectPool: setSelectedPoolId, createPool, addReading, refresh }}
+      value={{ pools, loading, selectedPoolId, selectedPool, selectPool: setSelectedPoolId, createPool, updatePool, deletePool, addReading, refresh }}
     >
       {children}
     </PoolContext.Provider>

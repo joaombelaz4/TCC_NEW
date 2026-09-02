@@ -56,26 +56,26 @@ export default function Alertas() {
         }}
       >
         <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: isNormal ? 'rgba(34,211,238,0.12)' : 'rgba(245,158,11,0.12)', border: `1px solid ${isNormal ? 'rgba(34,211,238,0.3)' : 'rgba(245,158,11,0.3)'}` }}>
-          <span style={{ color: isNormal ? '#22d3ee' : '#f59e0b', fontSize: 18 }}>{isNormal ? '✓' : '!'}</span>
+          <span style={{ color: isNormal ? 'var(--accent)' : '#f59e0b', fontSize: 18 }}>{isNormal ? '✓' : '!'}</span>
         </div>
         <div>
-          <p className="text-sm font-semibold" style={{ color: isNormal ? '#22d3ee' : '#f59e0b' }}>
+          <p className="text-sm font-semibold" style={{ color: isNormal ? 'var(--accent)' : '#f59e0b' }}>
             {isNormal ? 'Nenhum alerta registrado para esta piscina' : 'Existem leituras fora da faixa ideal'}
           </p>
-          <p className="text-xs mt-0.5" style={{ color: '#5d7fa0', fontFamily: "'JetBrains Mono', monospace" }}>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>
             {selectedPool.pH !== null ? `pH atual: ${selectedPool.pH.toFixed(2)}` : 'Sem leitura atual registrada'}
           </p>
         </div>
         <div className="ml-auto text-right">
-          <p className="text-xs" style={{ color: '#5d7fa0' }}>Total de alertas</p>
-          <p className="text-2xl font-bold" style={{ color: isNormal ? '#22d3ee' : '#f59e0b', fontFamily: "'JetBrains Mono', monospace" }}>{counts.all}</p>
+          <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Total de alertas</p>
+          <p className="text-2xl font-bold" style={{ color: isNormal ? 'var(--accent)' : '#f59e0b', fontFamily: "'JetBrains Mono', monospace" }}>{counts.all}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'pH ideal mínimo', value: '7,20', status: 'Abaixo → alerta', color: '#ef4444' },
-          { label: 'Faixa ideal', value: '7,2 – 7,6', status: 'Referência do sistema', color: '#22d3ee' },
+          { label: 'Faixa ideal', value: '7,2 – 7,6', status: 'Referência do sistema', color: 'var(--accent)' },
           { label: 'pH ideal máximo', value: '7,60', status: 'Acima → alerta', color: '#f59e0b' },
         ].map(({ label, value, status, color }) => (
           <div key={label} className="rounded-xl p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
@@ -90,7 +90,7 @@ export default function Alertas() {
         {filterBtns.map(f => (
           <button key={f.id} onClick={() => setFilter(f.id)}
             className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
-            style={{ background: filter === f.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: filter === f.id ? '#22d3ee' : '#5d7fa0', border: filter === f.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
+            style={{ background: filter === f.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: filter === f.id ? 'var(--accent)' : 'var(--muted-foreground)', border: filter === f.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
             {f.label}
           </button>
         ))}

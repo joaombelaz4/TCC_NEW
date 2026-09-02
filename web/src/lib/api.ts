@@ -46,4 +46,6 @@ async function request<T>(method: string, endpoint: string, body?: unknown): Pro
 export const api = {
   get: <T>(endpoint: string) => request<T>('GET', endpoint),
   post: <T>(endpoint: string, body?: unknown) => request<T>('POST', endpoint, body),
+  put: <T>(endpoint: string, body?: unknown) => request<T>('PUT', endpoint, body),
+  delete: <T>(endpoint: string) => request<T>('DELETE', endpoint),
 };
