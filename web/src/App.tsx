@@ -13,7 +13,7 @@ import NewPoolModal from './components/NewPoolModal';
 type Page = 'dashboard' | 'historico' | 'graficos' | 'alertas' | 'configuracoes';
 
 const navItems: { id: Page; label: string; icon: string }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: '⬡' },
+  { id: 'dashboard', label: 'Painel de controle', icon: '⬡' },
   { id: 'historico', label: 'Histórico', icon: '▤' },
   { id: 'graficos', label: 'Gráficos', icon: '↗' },
   { id: 'alertas', label: 'Alertas', icon: '◈' },
@@ -117,10 +117,10 @@ function AppShell() {
             <>
               <div className="text-xs font-medium truncate" style={{ color: 'var(--secondary-foreground)' }}>{user!.name}</div>
               <div className="text-xs truncate mb-2" style={{ color: 'var(--muted-foreground)' }}>{user!.email}</div>
-              <button onClick={logout} className="text-xs underline" style={{ color: 'var(--muted-foreground)' }}>Sair da conta</button>
+              <button onClick={() => { if (window.confirm('Você realmente deseja sair?')) logout(); }} className="text-xs underline" style={{ color: 'var(--muted-foreground)' }}>Sair da conta</button>
             </>
           ) : (
-            <button onClick={logout} title="Sair da conta" className="text-xs" style={{ color: 'var(--muted-foreground)' }}>⏻</button>
+            <button onClick={() => { if (window.confirm('Você realmente deseja sair?')) logout(); }} title="Sair da conta" className="text-xs" style={{ color: 'var(--muted-foreground)' }}>⏻</button>
           )}
         </div>
       </aside>

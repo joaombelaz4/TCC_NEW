@@ -41,7 +41,7 @@ function PoolCard({ pool, history, alerts, onNavigate, onRegister }: {
 }) {
   const hasReadings = pool.readings > 0 && pool.pH !== null;
   const chartData = [...history].reverse().slice(-12).map(reading => ({
-    time: new Date(reading.recordedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    time: new Date(reading.recordedAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ''),
     ph: reading.ph,
   }));
   const totalOk = history.filter(reading => reading.status === 'ok').length;
@@ -102,11 +102,18 @@ function PoolCard({ pool, history, alerts, onNavigate, onRegister }: {
 }
 
 export default function Dashboard({ onNavigate, onCreatePool }: Props) {
-  const { pools, loading: poolsLoading } = usePools();
+  const { pools, loading: poolsLoading, selectedPoolId } = usePools();
   const [histories, setHistories] = useState<Record<number, Reading[]>>({});
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [readingPoolId, setReadingPoolId] = useState<number | null>(null);
+  const orderedPools = selectedPoolId === null
+    ? pools
+    : [...pools].sort((firstPool, secondPool) => {
+      if (firstPool.id === selectedPoolId) return -1;
+      if (secondPool.id === selectedPoolId) return 1;
+      return 0;
+    });
 
   useEffect(() => {
     if (!pools.length) {
@@ -138,7 +145,7 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>{pools.length} piscina(s) cadastrada(s) · visão geral dos dados mais recentes</p>
       </div>
       <div className="grid grid-cols-1 gap-6">
-        {pools.map(pool => (
+        {orderedPools.map(pool => (
           <PoolCard key={pool.id} pool={pool} history={histories[pool.id] ?? []} alerts={alerts.filter(alert => alert.pool === pool.name)} onNavigate={onNavigate} onRegister={setReadingPoolId} />
         ))}
       </div>

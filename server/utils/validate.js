@@ -48,6 +48,42 @@ export function validateLogin(body) {
   return errors;
 }
 
+export function validateProfile(body) {
+  const errors = [];
+  const { name, email, currentPassword } = body ?? {};
+
+  if (isBlank(name)) {
+    errors.push('Nome é obrigatório.');
+  } else if (name.trim().length < 2) {
+    errors.push('Nome deve ter pelo menos 2 caracteres.');
+  }
+
+  if (isBlank(email)) {
+    errors.push('E-mail é obrigatório.');
+  } else if (!EMAIL_RE.test(email.trim())) {
+    errors.push('E-mail em formato inválido.');
+  }
+
+  if (isBlank(currentPassword)) errors.push('Senha atual é obrigatória.');
+
+  return errors;
+}
+
+export function validatePasswordChange(body) {
+  const errors = [];
+  const { currentPassword, newPassword, confirmPassword } = body ?? {};
+
+  if (isBlank(currentPassword)) errors.push('Senha atual é obrigatória.');
+  if (isBlank(newPassword)) {
+    errors.push('Nova senha é obrigatória.');
+  } else if (newPassword.length < 8) {
+    errors.push('Nova senha deve ter pelo menos 8 caracteres.');
+  }
+  if (newPassword !== confirmPassword) errors.push('A confirmação da nova senha não confere.');
+
+  return errors;
+}
+
 export function validatePool(body) {
   const errors = [];
   const { name } = body ?? {};

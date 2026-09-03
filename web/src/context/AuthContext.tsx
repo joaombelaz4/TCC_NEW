@@ -12,6 +12,8 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  updateProfile: (name: string, email: string, currentPassword: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -54,6 +56,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persistSession(res);
   }
 
+  async function updateProfile(name: string, email: string, currentPassword: string) {
+    const res = await api.put<{ user: User }>('/auth/profile', { name, email, currentPassword });
+    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    setUser(res.user);
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string, confirmPassword: string) {
+    await api.put('/auth/password', { currentPassword, newPassword, confirmPassword });
+  }
+
   function logout() {
     setToken(null);
     localStorage.removeItem(USER_KEY);
@@ -61,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateProfile, changePassword, logout }}>
       {children}
     </AuthContext.Provider>
   );
