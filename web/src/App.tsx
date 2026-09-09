@@ -98,6 +98,8 @@ function AppShell() {
             <button
               key={item.id}
               onClick={() => { setPage(item.id); setSidebarOpen(false); }}
+              title={!sidebarOpen ? item.label : undefined}
+              aria-label={item.label}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer"
               style={{
                 background: page === item.id ? 'rgba(6,182,212,0.12)' : 'transparent',
@@ -132,7 +134,7 @@ function AppShell() {
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex items-center gap-4 px-6 py-4 flex-shrink-0 flex-wrap" style={{ borderBottom: '1px solid rgba(6,182,212,0.08)', minHeight: '72px' }}>
-          <button onClick={() => setSidebarOpen(v => !v)} className="p-1.5 rounded-md transition-colors" style={{ color: 'var(--muted-foreground)' }}>
+          <button onClick={() => setSidebarOpen(v => !v)} title={sidebarOpen ? 'Recolher menu' : 'Abrir menu'} aria-label={sidebarOpen ? 'Recolher menu' : 'Abrir menu'} className="p-2 rounded-md transition-colors" style={{ color: 'var(--muted-foreground)' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
             </svg>
@@ -150,23 +152,27 @@ function AppShell() {
             <ThemeToggle />
             {pools.length > 0 && (
               <>
-                <select
-                  value={selectedPoolId ?? ''}
-                  onChange={e => selectPool(Number(e.target.value))}
-                  className="text-xs px-3 py-1.5 rounded-lg outline-none"
-                  style={{ background: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
-                >
-                  {pools.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+                <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                  Piscina:
+                  <select
+                    value={selectedPoolId ?? ''}
+                    onChange={e => selectPool(Number(e.target.value))}
+                    aria-label="Escolher piscina"
+                    className="text-sm px-3 py-2 rounded-lg outline-none"
+                    style={{ background: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                  >
+                    {pools.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </label>
                 <button
                   onClick={() => setEditPoolOpen(true)}
                   disabled={!selectedPool}
                   title="Editar piscina selecionada"
                   aria-label="Editar piscina selecionada"
-                  className="p-1.5 rounded-lg disabled:opacity-40"
+                  className="px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-40"
                   style={{ background: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
                 >
-                  ✎
+                  Editar
                 </button>
                 <button
                   onClick={async () => {
@@ -176,16 +182,16 @@ function AppShell() {
                   disabled={!selectedPool}
                   title="Excluir piscina selecionada"
                   aria-label="Excluir piscina selecionada"
-                  className="p-1.5 rounded-lg disabled:opacity-40"
+                  className="px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-40"
                   style={{ background: 'var(--muted)', border: '1px solid var(--border)', color: '#ef4444' }}
                 >
-                  ×
+                  Excluir
                 </button>
               </>
             )}
             <button
               onClick={() => setNewPoolOpen(true)}
-              className="text-xs px-3 py-1.5 rounded-lg font-medium"
+              className="text-sm px-4 py-2 rounded-lg font-medium"
               style={{ background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.2)', color: 'var(--accent)' }}
             >
               + Nova piscina

@@ -60,13 +60,10 @@ authRouter.post('/login', async (req, res) => {
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     const user = rows[0];
 
-    // Mensagem genérica de propósito: não revela se o e-mail existe ou não.
-    const invalidCredentials = () => res.status(401).json({ errors: ['E-mail ou senha inválidos.'] });
-
-    if (!user) return invalidCredentials();
+    if (!user) return res.status(401).json({ errors: ['E-mail não encontrado.'] });
 
     const passwordMatches = await bcrypt.compare(password, user.password_hash);
-    if (!passwordMatches) return invalidCredentials();
+    if (!passwordMatches) return res.status(401).json({ errors: ['Senha incorreta.'] });
 
     const token = signToken(user.id);
     res.json({ token, user: publicUser(user) });

@@ -7,7 +7,6 @@ export default function NewReadingModal({ poolId, onClose }: { poolId: number; o
   const { addReading } = usePools();
   const [ph, setPh] = useState('');
   const [cl, setCl] = useState('');
-  const [temp, setTemp] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -17,11 +16,10 @@ export default function NewReadingModal({ poolId, onClose }: { poolId: number; o
 
     const phNum = Number(ph.replace(',', '.'));
     const clNum = Number(cl.replace(',', '.'));
-    const tempNum = Number(temp.replace(',', '.'));
 
     setSubmitting(true);
     try {
-      await addReading(poolId, phNum, clNum, tempNum);
+      await addReading(poolId, phNum, clNum);
       onClose();
     } catch (err) {
       setErrors(err instanceof ApiError ? (err.errors ?? [err.message]) : ['Não foi possível registrar a medição.']);
@@ -36,10 +34,9 @@ export default function NewReadingModal({ poolId, onClose }: { poolId: number; o
         Enquanto o sensor via ESP32 não está integrado, registre aqui a leitura feita manualmente com o pHmetro.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <NumberField label="pH" value={ph} onChange={setPh} placeholder="7,40" />
           <NumberField label="Cloro (ppm)" value={cl} onChange={setCl} placeholder="1,20" />
-          <NumberField label="Temp. (°C)" value={temp} onChange={setTemp} placeholder="26" />
         </div>
 
         {errors.length > 0 && (

@@ -89,7 +89,7 @@ export default function Alertas() {
       <div className="flex gap-1 p-1 rounded-lg w-fit" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         {filterBtns.map(f => (
           <button key={f.id} onClick={() => setFilter(f.id)}
-            className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
+            className="px-4 py-2 rounded-md text-sm font-medium transition-all"
             style={{ background: filter === f.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: filter === f.id ? 'var(--accent)' : 'var(--muted-foreground)', border: filter === f.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
             {f.label}
           </button>

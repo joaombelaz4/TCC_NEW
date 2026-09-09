@@ -17,7 +17,6 @@ function mapPool(row) {
     // o frontend deve tratar isso como "sem dados", nunca inventar um valor.
     pH: row.current_ph !== null ? Number(row.current_ph) : null,
     cl: row.current_cl !== null ? Number(row.current_cl) : null,
-    temp: row.temp !== null ? Number(row.temp) : null,
     lastReadingAt: row.last_reading_at,
     readings: row.readings,
   };
@@ -127,14 +126,13 @@ poolsRouter.get('/:id/history', async (req, res) => {
     if (!pool) return res.status(404).json({ error: 'Piscina não encontrada.' });
 
     const [rows] = await db.query(
-      'SELECT recorded_at, ph, cl, temp, status FROM pool_history WHERE pool_id = ? ORDER BY recorded_at DESC LIMIT ?',
+      'SELECT recorded_at, ph, cl, status FROM pool_history WHERE pool_id = ? ORDER BY recorded_at DESC LIMIT ?',
       [poolId, limit],
     );
     res.json(rows.map(row => ({
       recordedAt: row.recorded_at,
       ph: Number(row.ph),
       cl: Number(row.cl),
-      temp: Number(row.temp),
       status: row.status,
     })));
   } catch (error) {
@@ -147,7 +145,7 @@ poolsRouter.get('/:id/history', async (req, res) => {
  * POST /api/pools/:id/readings — registra uma medição real.
  *
  * Hoje é chamada manualmente pelo usuário (tela de registro de leitura).
- * O formato do payload ({ ph, cl, temp }) foi desenhado para que, futuramente,
+ * O formato do payload ({ ph, cl }) foi desenhado para que, futuramente,
  * o ESP32 possa chamar exatamente esta mesma rota sem precisar de nenhuma
  * mudança de arquitetura — só troca quem está do outro lado da requisição.
  */
@@ -158,7 +156,7 @@ poolsRouter.post('/:id/readings', async (req, res) => {
   const errors = validateReading(req.body);
   if (errors.length) return res.status(400).json({ errors });
 
-  const { ph, cl, temp } = req.body;
+  const { ph, cl } = req.body;
   const connection = await db.getConnection();
 
   try {
@@ -176,15 +174,15 @@ poolsRouter.post('/:id/readings', async (req, res) => {
     await connection.beginTransaction();
 
     await connection.query(
-      'INSERT INTO pool_history (pool_id, recorded_at, ph, cl, temp, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [poolId, recordedAt, ph, cl, temp, status],
+      'INSERT INTO pool_history (pool_id, recorded_at, ph, cl, status) VALUES (?, ?, ?, ?, ?)',
+      [poolId, recordedAt, ph, cl, status],
     );
 
     await connection.query(
       `UPDATE pools
-       SET current_ph = ?, current_cl = ?, temp = ?, last_reading_at = ?, readings = readings + 1
+      SET current_ph = ?, current_cl = ?, temp = NULL, last_reading_at = ?, readings = readings + 1
        WHERE id = ?`,
-      [ph, cl, temp, recordedAt, poolId],
+          [ph, cl, recordedAt, poolId],
     );
 
     if (status !== 'ok') {

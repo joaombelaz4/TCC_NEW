@@ -52,7 +52,7 @@ export default function Historico() {
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
+              className="px-4 py-2 rounded-md text-sm font-medium transition-all"
               style={{
                 background: filter === f.id ? 'rgba(6,182,212,0.15)' : 'transparent',
                 color: filter === f.id ? 'var(--accent)' : 'var(--muted-foreground)',
@@ -66,7 +66,7 @@ export default function Historico() {
 
         <button
           onClick={() => setSort(s => (s === 'desc' ? 'asc' : 'desc'))}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs transition-all"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-all"
           style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
         >
           {sort === 'desc' ? '↓' : '↑'} {sort === 'desc' ? 'Mais recente' : 'Mais antigo'}
@@ -88,7 +88,7 @@ export default function Historico() {
           <table className="w-full">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Data', 'Horário', 'pH', 'Cloro (ppm)', 'Temp (°C)', 'Status'].map(col => (
+                {['Data', 'Horário', 'pH', 'Cloro (ppm)', 'Status'].map(col => (
                   <th key={col} className="text-left px-5 py-3 text-xs uppercase tracking-wider" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace", fontWeight: 500 }}>
                     {col}
                   </th>
@@ -105,7 +105,6 @@ export default function Historico() {
                     <td className="px-5 py-3 text-sm" style={{ color: 'var(--card-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-5 py-3"><span className="text-base font-bold" style={{ color, fontFamily: "'JetBrains Mono', monospace" }}>{r.ph.toFixed(2)}</span></td>
                     <td className="px-5 py-3 text-sm" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{r.cl.toFixed(2)}</td>
-                    <td className="px-5 py-3 text-sm" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{r.temp.toFixed(1)}</td>
                     <td className="px-5 py-3">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: `${color}14`, color, border: `1px solid ${color}33`, fontFamily: "'JetBrains Mono', monospace" }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />{statusLabel[r.status]}

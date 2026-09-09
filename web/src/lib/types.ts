@@ -10,7 +10,6 @@ export interface Pool {
   size: string | null;
   pH: number | null;
   cl: number | null;
-  temp: number | null;
   lastReadingAt: string | null;
   readings: number;
 }
@@ -19,7 +18,6 @@ export interface Reading {
   recordedAt: string;
   ph: number;
   cl: number;
-  temp: number;
   status: 'ok' | 'warn' | 'danger';
 }
 

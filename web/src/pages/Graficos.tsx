@@ -83,7 +83,7 @@ export default function Graficos() {
         <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
           {views.map(v => (
             <button key={v.id} onClick={() => setView(v.id)}
-              className="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
+              className="px-4 py-2 rounded-md text-sm font-medium transition-all"
               style={{ background: view === v.id ? 'rgba(6,182,212,0.15)' : 'transparent', color: view === v.id ? 'var(--accent)' : 'var(--muted-foreground)', border: view === v.id ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent' }}>
               {v.label}
             </button>

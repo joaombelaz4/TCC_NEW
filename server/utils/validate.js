@@ -8,6 +8,8 @@
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const SIZE_DIMENSIONS_RE = /^(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)(?:\s*x\s*(\d+(?:[.,]\d+)?))?\s*m(?:etros?)?$/i;
+const SIZE_VOLUME_RE = /^~?\s*([\d.,]+)\s*(?:l|litros?)$/i;
 
 function isBlank(value) {
   return typeof value !== 'string' || value.trim().length === 0;
@@ -86,7 +88,7 @@ export function validatePasswordChange(body) {
 
 export function validatePool(body) {
   const errors = [];
-  const { name } = body ?? {};
+  const { name, size } = body ?? {};
 
   if (isBlank(name)) {
     errors.push('Nome da piscina é obrigatório.');
@@ -94,20 +96,38 @@ export function validatePool(body) {
     errors.push('Nome da piscina deve ter no máximo 100 caracteres.');
   }
 
+  if (typeof size === 'string' && size.trim()) {
+    const normalizedSize = size.trim();
+    const dimensions = normalizedSize.match(SIZE_DIMENSIONS_RE);
+    const volume = normalizedSize.match(SIZE_VOLUME_RE);
+
+    if (dimensions) {
+      const values = dimensions.slice(1).filter(Boolean).map(value => Number(value.replace(',', '.')));
+      if (values.some(value => value < 1 || value > 100)) {
+        errors.push('Cada dimensão da piscina deve estar entre 1 m e 100 m.');
+      }
+    } else if (volume) {
+      const liters = Number(volume[1].replace(/\./g, '').replace(',', '.'));
+      if (!Number.isFinite(liters) || liters < 100 || liters > 10000000) {
+        errors.push('O volume deve estar entre 100 L e 10.000.000 L.');
+      }
+    } else {
+      errors.push('Informe o tamanho no formato 8 x 4 m ou 45.000 L.');
+    }
+  }
+
   return errors;
 }
 
 export function validateReading(body) {
   const errors = [];
-  const { ph, cl, temp } = body ?? {};
+  const { ph, cl } = body ?? {};
 
   if (typeof ph !== 'number' || Number.isNaN(ph)) errors.push('pH é obrigatório e deve ser numérico.');
   else if (ph < 0 || ph > 14) errors.push('pH deve estar entre 0 e 14.');
 
   if (typeof cl !== 'number' || Number.isNaN(cl)) errors.push('Cloro (cl) é obrigatório e deve ser numérico.');
   else if (cl < 0) errors.push('Cloro não pode ser negativo.');
-
-  if (typeof temp !== 'number' || Number.isNaN(temp)) errors.push('Temperatura é obrigatória e deve ser numérica.');
 
   return errors;
 }

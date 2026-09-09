@@ -62,7 +62,7 @@ function PoolCard({ pool, history, alerts, onNavigate, onRegister }: {
       <div className="grid grid-cols-1 lg:grid-cols-[190px_1fr] gap-5 items-center">
         <div className="flex flex-col items-center">
           <PhGauge ph={pool.pH ?? undefined} state={hasReadings ? undefined : 'empty'} />
-          <button onClick={() => onRegister(pool.id)} className="w-full mt-4 py-2 rounded-lg text-xs font-semibold" style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.3)', color: 'var(--accent)' }}>
+          <button onClick={() => onRegister(pool.id)} className="w-full mt-4 py-3 rounded-lg text-sm font-semibold" style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.3)', color: 'var(--accent)' }}>
             + Registrar medição
           </button>
         </div>
@@ -93,7 +93,7 @@ function PoolCard({ pool, history, alerts, onNavigate, onRegister }: {
           </div>
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{alerts.length ? `${alerts.length} alerta(s) recente(s)` : 'Nenhum alerta recente'}</span>
-            <button className="text-xs underline" style={{ color: 'var(--muted-foreground)' }} onClick={() => onNavigate('historico')}>Ver histórico</button>
+            <button className="px-3 py-2 rounded-lg text-sm font-medium" style={{ color: 'var(--muted-foreground)', background: 'var(--muted)' }} onClick={() => onNavigate('historico')}>Ver histórico</button>
           </div>
         </div>
       </div>

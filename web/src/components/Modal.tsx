@@ -20,7 +20,15 @@ export default function Modal({ title, onClose, children }: Props) {
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold" style={{ color: 'var(--foreground)' }}>{title}</h3>
-          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}>✕</button>
+          <button
+            onClick={onClose}
+            title="Fechar janela"
+            aria-label="Fechar janela"
+            className="px-3 py-2 rounded-lg text-sm font-medium"
+            style={{ color: 'var(--muted-foreground)', background: 'var(--muted)' }}
+          >
+            Fechar
+          </button>
         </div>
         {children}
       </div>

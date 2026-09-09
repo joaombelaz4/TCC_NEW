@@ -42,7 +42,7 @@ CREATE TABLE pool_history (
   recorded_at DATETIME NOT NULL,
   ph DECIMAL(4,2) NOT NULL,
   cl DECIMAL(4,2) NOT NULL,
-  temp DECIMAL(4,1) NOT NULL,
+  temp DECIMAL(4,1) DEFAULT NULL,
   status ENUM('ok','warn','danger') NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (pool_id) REFERENCES pools(id) ON DELETE CASCADE
