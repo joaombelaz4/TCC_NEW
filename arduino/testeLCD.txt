@@ -1,1 +1,30 @@
-https://github.com/joaombelaz4/TCC_NEW.git
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// Define o endereço do LCD (geralmente 0x27 ou 0x3F), 16 colunas e 2 linhas
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  // No ESP32, os pinos padrão do I2C são: SDA = GPIO 21 e SCL = GPIO 22
+  Wire.begin(21, 22);
+  
+  lcd.init();           // Inicializa o LCD
+  lcd.backlight();      // Liga a luz de fundo (backlight)
+  
+  lcd.setCursor(0, 0);  // Coluna 0, Linha 0
+  lcd.print("Teste LCD ESP32!");
+  
+  lcd.setCursor(0, 1);  // Coluna 0, Linha 1
+  lcd.print("Status: OK!");
+}
+
+void loop() {
+  // Pisca o texto da segunda linha para confirmar que o loop está rodando
+  lcd.setCursor(0, 1);
+  lcd.print("Status: OK!    ");
+  delay(1000);
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Status: LENDO..");
+  delay(1000);
+}
