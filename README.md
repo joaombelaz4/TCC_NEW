@@ -1,6 +1,6 @@
 # AquaMonitor — Sistema de Monitoramento de pH de Piscinas (TCC)
 
-Sistema web para cadastro de piscinas e acompanhamento de medições reais de pH, cloro e temperatura.
+Sistema web para cadastro de piscinas e acompanhamento de medições reais de pH, cloro e temperatura
 
 ## Stack
 
