@@ -1,36 +1,61 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
-// Inisialisasi LCD I2C (alamat umum 0x27, bisa 0x3F tergantung modul)
+// --- CONFIGURAÇÕES DE REDE ---
+const char* ssid = "Lab_Esp32";
+const char* password = "";
+const String googleScriptURL = "https://script.google.com/macros/s/AKfycbxD026GRuwsrpp4ZtVupe28RtveiGlBh_EIm5JTVj0ZVDQr7-PpcuFOE49jmAYInrWP/exec";
+const String boardID = "ESP32_pH_01"; // Identificação única da sua placa
+
+// --- CONFIGURAÇÃO DO LCD (I2C) ---
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+// --- CONFIGURAÇÕES DO SENSOR DE pH ---
+#define PH_SENSOR_PIN 34  // GPIO34 conectado ao sensor de pH
 float calibration_value = 21.34 + 1.5;
 unsigned long int avgval;
 int buffer_arr[10], temp;
 float ph_act;
 
-// Tentukan pin analog untuk sensor pH
-#define PH_SENSOR_PIN 34   // GPIO34 contoh, bisa ganti ke pin analog lain
+// Intervalo de envio para a planilha (ex: a cada 30 segundos)
+unsigned long ultimaLeitura = 0;
+const long intervaloEnvio = 30000; 
 
 void setup() {
+  Serial.begin(115200);
+  
+  // Inicializa LCD
   Wire.begin();
-  Serial.begin(115200);   // Baudrate umum ESP32
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
-  lcd.print("pH Sensor Ready");
+  lcd.print("Conectando Wi-Fi");
+
+  // Conecta ao Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  Serial.println("\nWi-Fi Conectado!");
+  lcd.clear();
+  lcd.print("WiFi Conectado!");
   delay(2000);
   lcd.clear();
 }
 
 void loop() {
-  // Baca data analog
+  // 1. Faz a leitura do sensor de pH (mesma lógica do seu projeto)
   for (int i = 0; i < 10; i++) {
     buffer_arr[i] = analogRead(PH_SENSOR_PIN);
     delay(30);
   }
 
-  // Urutkan data (bubble sort)
+  // Ordena os dados (Bubble Sort) para remover ruídos
   for (int i = 0; i < 9; i++) {
     for (int j = i + 1; j < 10; j++) {
       if (buffer_arr[i] > buffer_arr[j]) {
@@ -41,25 +66,135 @@ void loop() {
     }
   }
 
-  // Ambil rata-rata dari data tengah
+  // Média dos valores centrais
   avgval = 0;
   for (int i = 2; i < 8; i++)
     avgval += buffer_arr[i];
 
-  // Konversi ke voltase ESP32
   float volt = (float)avgval * 3.3 / 4095.0 / 6;
   ph_act = -5.70 * volt + calibration_value;
 
-  // Tampilkan di Serial Monitor
+  // Exibe no Serial Monitor e LCD em tempo real
   Serial.print("pH Value: ");
   Serial.println(ph_act);
 
-  // Tampilkan di LCD
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("pH Value:");
   lcd.setCursor(0, 1);
-  lcd.print(ph_act, 2);    // 2 angka di belakang koma
+  lcd.print(ph_act, 2);
 
-  delay(1000); // Delay untuk kestabilan pembacaan
+  // 2. Envia para o Google Sheets periodicamente (respeitando o intervalo)
+  if (millis() - ultimaLeitura >= intervaloEnvio || ultimaLeitura == 0) {
+    ultimaLeitura = millis();
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("Enviando dados para o Google Sheets...");
+      
+      float dadosParaEnviar[1] = {ph_act};
+      bool sucesso = escreverEmLista(boardID, 1, dadosParaEnviar);
+      
+      if (sucesso) {
+        Serial.println("Dados enviados com sucesso!");
+      } else {
+        Serial.println("Falha no envio.");
+      }
+    } else {
+      Serial.println("Erro: Wi-Fi desconectado.");
+    }
+  }
+
+  delay(1000); 
+}
+
+// --- FUNÇÕES DE COMUNICAÇÃO COM O GOOGLE SHEETS ---
+
+bool escreverEmLista(String identificacao, int numDados, float dados[]) {
+  bool flag_envio = false;
+  HTTPClient http;
+  
+  http.begin(googleScriptURL);
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS); // Trata redirecionamentos automaticamente
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument<200> jsonDoc;
+  jsonDoc["action"] = "escreverEmLista";
+  jsonDoc["identificacao"] = identificacao;
+  
+  JsonArray jsonDados = jsonDoc.createNestedArray("dados");
+  for (int i = 0; i < numDados; i++) {
+    jsonDados.add(dados[i]);
+  }
+
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  int httpResponseCode = http.POST(jsonString);
+
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println("Resposta do Servidor: " + response);
+    flag_envio = true;
+  } else {
+    Serial.print("Erro no envio HTTP, código: ");
+    Serial.println(httpResponseCode);
+    flag_envio = false;
+  }
+  
+  http.end();
+  return flag_envio;
+}
+
+bool escreverEmCelula(String identificacao, String celula, String dado) {
+  bool flag_envio = false;
+  HTTPClient http;
+  
+  http.begin(googleScriptURL);
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument<200> jsonDoc;
+  jsonDoc["action"] = "escreverEmCelula";
+  jsonDoc["identificacao"] = identificacao;
+  jsonDoc["celula"] = celula;
+  jsonDoc["dado"] = dado;
+
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  int httpResponseCode = http.POST(jsonString);
+
+  if (httpResponseCode > 0) {
+    flag_envio = true;
+  }
+  
+  http.end();
+  return flag_envio;
+}
+
+String lerCelula(String identificacao, String celula) {
+  HTTPClient http;
+  http.begin(googleScriptURL);
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument<200> jsonDoc;
+  jsonDoc["action"] = "lerCelula";
+  jsonDoc["identificacao"] = identificacao;
+  jsonDoc["celula"] = celula;
+
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  int httpResponseCode = http.POST(jsonString);
+  String response = "";
+
+  if (httpResponseCode > 0) {
+    response = http.getString();
+  } else {
+    response = "Erro ao ler célula";
+  }
+  
+  http.end();
+  return response;
 }
