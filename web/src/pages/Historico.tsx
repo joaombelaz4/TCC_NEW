@@ -104,7 +104,7 @@ export default function Historico() {
                     <td className="px-5 py-3 text-sm" style={{ color: 'var(--card-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{d.toLocaleDateString('pt-BR')}</td>
                     <td className="px-5 py-3 text-sm" style={{ color: 'var(--card-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-5 py-3"><span className="text-base font-bold" style={{ color, fontFamily: "'JetBrains Mono', monospace" }}>{r.ph.toFixed(2)}</span></td>
-                    <td className="px-5 py-3 text-sm" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{r.cl.toFixed(2)}</td>
+                    <td className="px-5 py-3 text-sm" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>{r.cl === null ? '--' : r.cl.toFixed(2)}</td>
                     <td className="px-5 py-3">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: `${color}14`, color, border: `1px solid ${color}33`, fontFamily: "'JetBrains Mono', monospace" }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />{statusLabel[r.status]}

@@ -131,3 +131,13 @@ export function validateReading(body) {
 
   return errors;
 }
+
+export function validatePhReading(body) {
+  const errors = [];
+  const { ph } = body ?? {};
+
+  if (typeof ph !== 'number' || !Number.isFinite(ph)) errors.push('pH é obrigatório e deve ser numérico.');
+  else if (ph < 0 || ph > 14) errors.push('pH deve estar entre 0 e 14.');
+
+  return errors;
+}

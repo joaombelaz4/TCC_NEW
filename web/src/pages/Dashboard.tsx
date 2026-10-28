@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import PhGauge from '../components/PhGauge';
+import Esp32SerialPanel from '../components/Esp32SerialPanel';
 import EmptyState from '../components/EmptyState';
 import NewReadingModal from '../components/NewReadingModal';
 import { usePools } from '../context/PoolContext';
@@ -132,14 +133,18 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
     }).finally(() => setLoadingData(false));
   }, [pools]);
 
-  if (poolsLoading || loadingData) return null;
-
-  if (pools.length === 0) {
-    return <div className="p-6"><div className="rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}><EmptyState title="Você ainda não tem nenhuma piscina cadastrada." hint="Cadastre sua primeira piscina para começar a registrar medições de pH." action={{ label: '+ Cadastrar piscina', onClick: onCreatePool }} /></div></div>;
-  }
+  const initialDataLoading = loadingData && pools.length > 0 && Object.keys(histories).length === 0;
+  if (poolsLoading || initialDataLoading) return null;
 
   return (
     <div className="p-6 md:p-8 space-y-6">
+      <Esp32SerialPanel />
+      {pools.length === 0 ? (
+        <div className="rounded-lg" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+          <EmptyState title="Você ainda não tem nenhuma piscina cadastrada." hint="Cadastre sua primeira piscina para começar a registrar medições de pH." action={{ label: '+ Cadastrar piscina', onClick: onCreatePool }} />
+        </div>
+      ) : (
+        <>
       <div>
         <h1 className="text-xl font-semibold" style={{ color: 'var(--foreground)' }}>Todas as piscinas</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>{pools.length} piscina(s) cadastrada(s) · visão geral dos dados mais recentes</p>
@@ -150,6 +155,8 @@ export default function Dashboard({ onNavigate, onCreatePool }: Props) {
         ))}
       </div>
       {readingPoolId !== null && <NewReadingModal poolId={readingPoolId} onClose={() => setReadingPoolId(null)} />}
+        </>
+      )}
     </div>
   );
 }

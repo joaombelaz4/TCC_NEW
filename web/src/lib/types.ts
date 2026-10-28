@@ -17,7 +17,7 @@ export interface Pool {
 export interface Reading {
   recordedAt: string;
   ph: number;
-  cl: number;
+  cl: number | null;
   status: 'ok' | 'warn' | 'danger';
 }
 

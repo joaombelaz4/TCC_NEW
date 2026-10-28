@@ -4,7 +4,10 @@
   "description": "Sistema de monitoramento de pH para piscinas",
   "type": "module",
   "scripts": {
+    "build": "npm --prefix web run build",
+    "predev": "npm run build",
     "dev": "node server/index.js",
+    "prestart": "npm run build",
     "start": "node server/index.js",
     "lint": "npx eslint server/**/*.js src/**/*.js",
     "db:init": "mysql -u \"$DB_USER\" -p\"$DB_PASSWORD\" -h \"$DB_HOST\" < create-db.sql"

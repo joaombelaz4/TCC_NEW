@@ -13,6 +13,7 @@ interface PoolContextValue {
   updatePool: (id: number, name: string, size?: string) => Promise<Pool>;
   deletePool: (id: number) => Promise<void>;
   addReading: (poolId: number, ph: number, cl: number) => Promise<void>;
+  addPhReading: (poolId: number, ph: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -71,11 +72,16 @@ export function PoolProvider({ children }: { children: ReactNode }) {
     setPools(prev => prev.map(p => (p.id === updated.id ? updated : p)));
   }
 
+  async function addPhReading(poolId: number, ph: number) {
+    const updated = await api.post<Pool>(`/pools/${poolId}/readings/ph`, { ph });
+    setPools(prev => prev.map(p => (p.id === updated.id ? updated : p)));
+  }
+
   const selectedPool = pools.find(p => p.id === selectedPoolId) ?? null;
 
   return (
     <PoolContext.Provider
-      value={{ pools, loading, selectedPoolId, selectedPool, selectPool: setSelectedPoolId, createPool, updatePool, deletePool, addReading, refresh }}
+      value={{ pools, loading, selectedPoolId, selectedPool, selectPool: setSelectedPoolId, createPool, updatePool, deletePool, addReading, addPhReading, refresh }}
     >
       {children}
     </PoolContext.Provider>

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
-import { validatePool, validateReading } from '../utils/validate.js';
+import { validatePool, validateReading, validatePhReading } from '../utils/validate.js';
 import { phStatus, clStatus } from '../shared/thresholds.js';
 
 export const poolsRouter = Router();
@@ -132,7 +132,7 @@ poolsRouter.get('/:id/history', async (req, res) => {
     res.json(rows.map(row => ({
       recordedAt: row.recorded_at,
       ph: Number(row.ph),
-      cl: Number(row.cl),
+      cl: row.cl !== null ? Number(row.cl) : null,
       status: row.status,
     })));
   } catch (error) {
@@ -202,6 +202,63 @@ poolsRouter.post('/:id/readings', async (req, res) => {
     await connection.rollback();
     console.error(error);
     res.status(500).json({ error: 'Falha ao registrar a medição.' });
+  } finally {
+    connection.release();
+  }
+});
+
+poolsRouter.post('/:id/readings/ph', async (req, res) => {
+  const poolId = Number(req.params.id);
+  if (!poolId) return res.status(400).json({ error: 'Id de piscina inválido.' });
+
+  const errors = validatePhReading(req.body);
+  if (errors.length) return res.status(400).json({ errors });
+
+  const { ph } = req.body;
+  const connection = await db.getConnection();
+
+  try {
+    const pool = await findOwnedPool(poolId, req.userId);
+    if (!pool) return res.status(404).json({ error: 'Piscina não encontrada.' });
+
+    const status = phStatus(ph);
+    const recordedAt = new Date();
+
+    await connection.beginTransaction();
+    await connection.query(
+      'INSERT INTO pool_history (pool_id, recorded_at, ph, cl, status) VALUES (?, ?, ?, NULL, ?)',
+      [poolId, recordedAt, ph, status],
+    );
+    await connection.query(
+      `UPDATE pools
+        SET current_ph = ?, current_cl = NULL, temp = NULL, last_reading_at = ?, readings = readings + 1
+       WHERE id = ? AND user_id = ?`,
+      [ph, recordedAt, poolId, req.userId],
+    );
+
+    if (status !== 'ok') {
+      const [recentAlerts] = await connection.query(
+        `SELECT id FROM pool_alerts
+         WHERE pool_id = ? AND type = ? AND occurred_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+         LIMIT 1`,
+        [poolId, status],
+      );
+
+      if (recentAlerts.length === 0) {
+        await connection.query(
+          'INSERT INTO pool_alerts (pool_id, type, title, msg, occurred_at) VALUES (?, ?, ?, ?, ?)',
+          [poolId, status, status === 'danger' ? 'pH fora da faixa segura' : 'pH próximo do limite', `pH ${ph.toFixed(2)}`, recordedAt],
+        );
+      }
+    }
+
+    await connection.commit();
+    const updatedPool = await findOwnedPool(poolId, req.userId);
+    res.status(201).json(mapPool(updatedPool));
+  } catch (error) {
+    await connection.rollback();
+    console.error(error);
+    res.status(500).json({ error: 'Falha ao registrar a leitura de pH.' });
   } finally {
     connection.release();
   }

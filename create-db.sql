@@ -41,7 +41,7 @@ CREATE TABLE pool_history (
   pool_id INT NOT NULL,
   recorded_at DATETIME NOT NULL,
   ph DECIMAL(4,2) NOT NULL,
-  cl DECIMAL(4,2) NOT NULL,
+  cl DECIMAL(4,2) DEFAULT NULL,
   temp DECIMAL(4,1) DEFAULT NULL,
   status ENUM('ok','warn','danger') NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

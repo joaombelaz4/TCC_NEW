@@ -22,7 +22,7 @@ float ph_act;
 
 // Intervalo de envio para a planilha (ex: a cada 30 segundos)
 unsigned long ultimaLeitura = 0;
-const long intervaloEnvio = 30000; 
+const long intervaloEnvio = 5000; 
 
 void setup() {
   Serial.begin(115200);
