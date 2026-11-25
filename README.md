@@ -1,4 +1,4 @@
-# AquaMonitor
+# MOpH
 
 Aplicação web para cadastrar piscinas, acompanhar o pH atual e consultar o histórico de medições. O pH pode ser registrado manualmente ou lido de um ESP32 pela porta serial do navegador.
 

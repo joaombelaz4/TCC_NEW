@@ -43,8 +43,8 @@ export default function Login() {
               <circle cx="12" cy="12" r="2" fill="var(--primary)" />
             </svg>
           </div>
-          <h1 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>AquaMonitor</h1>
-          <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Sistema de Monitoramento de pH</p>
+          <h1 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>MOpH</h1>
+          <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Monitor Online de pH</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

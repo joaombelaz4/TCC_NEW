@@ -4,9 +4,8 @@ import { usePools } from '../context/PoolContext';
 import { ApiError } from '../context/AuthContext';
 
 export default function NewReadingModal({ poolId, onClose }: { poolId: number; onClose: () => void }) {
-  const { addReading } = usePools();
+  const { addPhReading } = usePools();
   const [ph, setPh] = useState('');
-  const [cl, setCl] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -15,11 +14,10 @@ export default function NewReadingModal({ poolId, onClose }: { poolId: number; o
     setErrors([]);
 
     const phNum = Number(ph.replace(',', '.'));
-    const clNum = Number(cl.replace(',', '.'));
 
     setSubmitting(true);
     try {
-      await addReading(poolId, phNum, clNum);
+      await addPhReading(poolId, phNum);
       onClose();
     } catch (err) {
       setErrors(err instanceof ApiError ? (err.errors ?? [err.message]) : ['Não foi possível registrar a medição.']);
@@ -34,10 +32,7 @@ export default function NewReadingModal({ poolId, onClose }: { poolId: number; o
         Enquanto o sensor via ESP32 não está integrado, registre aqui a leitura feita manualmente com o pHmetro.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-3">
-          <NumberField label="pH" value={ph} onChange={setPh} placeholder="7,40" />
-          <NumberField label="Cloro (ppm)" value={cl} onChange={setCl} placeholder="1,20" />
-        </div>
+        <NumberField label="pH" value={ph} onChange={setPh} placeholder="7,40" />
 
         {errors.length > 0 && (
           <ul className="text-xs rounded-lg p-3" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>

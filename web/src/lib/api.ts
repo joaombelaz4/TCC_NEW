@@ -1,4 +1,5 @@
-const TOKEN_KEY = 'aquamonitor.token';
+const TOKEN_KEY = 'moph.token';
+const LEGACY_TOKEN_KEY = 'aquamonitor.token';
 
 export class ApiError extends Error {
   status: number;
@@ -12,12 +13,24 @@ export class ApiError extends Error {
 }
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+    return token;
+  }
+
+  const legacyToken = localStorage.getItem(LEGACY_TOKEN_KEY);
+  if (!legacyToken) return null;
+
+  localStorage.setItem(TOKEN_KEY, legacyToken);
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
+  return legacyToken;
 }
 
 export function setToken(token: string | null) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
   else localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
 }
 
 async function request<T>(method: string, endpoint: string, body?: unknown): Promise<T> {

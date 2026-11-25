@@ -9,7 +9,6 @@ export interface Pool {
   name: string;
   size: string | null;
   pH: number | null;
-  cl: number | null;
   lastReadingAt: string | null;
   readings: number;
 }
@@ -17,7 +16,6 @@ export interface Pool {
 export interface Reading {
   recordedAt: string;
   ph: number;
-  cl: number | null;
   status: 'ok' | 'warn' | 'danger';
 }
 
@@ -33,8 +31,5 @@ export interface Alert {
 export interface Settings {
   ph_min?: string;
   ph_max?: string;
-  cl_min?: string;
-  cl_max?: string;
-  sensor_frequency?: string;
   [key: string]: string | undefined;
 }

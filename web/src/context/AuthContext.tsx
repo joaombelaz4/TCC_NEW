@@ -21,7 +21,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 // Como não existe uma rota "quem sou eu" ainda, guardamos o usuário retornado
 // no login/cadastro junto com o token, e restauramos os dois do localStorage.
-const USER_KEY = 'aquamonitor.user';
+const USER_KEY = 'moph.user';
+const LEGACY_USER_KEY = 'aquamonitor.user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -29,7 +30,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const token = getToken();
-    const storedUser = localStorage.getItem(USER_KEY);
+    let storedUser = localStorage.getItem(USER_KEY);
+    if (storedUser) {
+      localStorage.removeItem(LEGACY_USER_KEY);
+    } else {
+      storedUser = localStorage.getItem(LEGACY_USER_KEY);
+      if (storedUser) {
+        localStorage.setItem(USER_KEY, storedUser);
+        localStorage.removeItem(LEGACY_USER_KEY);
+      }
+    }
     if (token && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -69,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     setToken(null);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(LEGACY_USER_KEY);
     setUser(null);
   }
 

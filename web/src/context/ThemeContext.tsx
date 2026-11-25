@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 
 type Theme = 'dark' | 'light';
 
-const STORAGE_KEY = 'aquamonitor_theme';
+const STORAGE_KEY = 'moph_theme';
+const LEGACY_STORAGE_KEY = 'aquamonitor_theme';
 
 interface ThemeContextValue {
   theme: Theme;
@@ -13,7 +14,16 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === 'dark' || stored === 'light') return stored;
+  if (stored === 'dark' || stored === 'light') {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    return stored;
+  }
+  const legacyStored = localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (legacyStored === 'dark' || legacyStored === 'light') {
+    localStorage.setItem(STORAGE_KEY, legacyStored);
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    return legacyStored;
+  }
   // Sem preferência salva ainda: respeita o tema do sistema operacional.
   return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }

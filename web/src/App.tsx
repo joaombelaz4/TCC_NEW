@@ -87,8 +87,8 @@ function AppShell() {
           </div>
           {sidebarOpen && (
             <div>
-              <div className="font-semibold text-sm leading-none" style={{ color: 'var(--foreground)' }}>AquaMonitor</div>
-              <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>v1.0</div>
+              <div className="font-semibold text-sm leading-none" style={{ color: 'var(--foreground)' }}>MOpH</div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)', fontFamily: "'JetBrains Mono', monospace" }}>v2.4.2</div>
             </div>
           )}
         </div>

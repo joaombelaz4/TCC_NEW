@@ -8,6 +8,7 @@ export default defineConfig({
     outDir: '../public',
   },
   server: {
+    host: '0.0.0.0',
     proxy: {
       // Em desenvolvimento, o Vite roda em uma porta separada do Express.
       // Isso encaminha chamadas /api/* para o backend (ver server/index.js).

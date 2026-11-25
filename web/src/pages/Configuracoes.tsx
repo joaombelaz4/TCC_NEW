@@ -6,10 +6,9 @@ import { useAuth } from '../context/AuthContext';
 const FIELDS: { key: keyof Settings; label: string; hint: string }[] = [
   { key: 'ph_min', label: 'pH mínimo', hint: 'Alertas gerados abaixo deste valor' },
   { key: 'ph_max', label: 'pH máximo', hint: 'Alertas gerados acima deste valor' },
-  { key: 'cl_min', label: 'Cloro mínimo (ppm)', hint: 'Alertas gerados abaixo deste valor' },
-  { key: 'cl_max', label: 'Cloro máximo (ppm)', hint: 'Alertas gerados acima deste valor' },
-  { key: 'sensor_frequency', label: 'Frequência de leitura', hint: 'Ex: 30m — usado quando o ESP32 estiver integrado' },
 ];
+
+const DEFAULT_PH_LIMITS = { ph_min: '7.2', ph_max: '7.8' };
 
 function Field({ label, value, onChange, hint, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; hint?: string; type?: 'text' | 'password' | 'email' }) {
   return (
@@ -44,6 +43,7 @@ export default function Configuracoes() {
   const [values, setValues] = useState<Settings>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [restoringDefaults, setRestoringDefaults] = useState(false);
   const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [account, setAccount] = useState({ name: user?.name ?? '', email: user?.email ?? '', currentPassword: '' });
@@ -105,13 +105,31 @@ export default function Configuracoes() {
     setErrors([]);
     setSaving(true);
     try {
-      await api.post('/settings', values);
+      await api.post('/settings', {
+        ph_min: values.ph_min,
+        ph_max: values.ph_max,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       setErrors(err instanceof ApiError ? (err.errors ?? [err.message]) : ['Não foi possível salvar as configurações.']);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleRestoreDefaults() {
+    setErrors([]);
+    setRestoringDefaults(true);
+    try {
+      await api.post('/settings', DEFAULT_PH_LIMITS);
+      setValues(prev => ({ ...prev, ...DEFAULT_PH_LIMITS }));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setErrors(err instanceof ApiError ? (err.errors ?? [err.message]) : ['Não foi possível restaurar os limites de pH.']);
+    } finally {
+      setRestoringDefaults(false);
     }
   }
 
@@ -139,12 +157,20 @@ export default function Configuracoes() {
         <SaveButton saving={passwordSaving} saved={passwordSaved} onClick={handlePasswordSave} savingLabel="Alterando..." savedLabel="Senha alterada" label="Alterar senha" />
       </Section>
 
-      <Section title="Limites de pH e cloro" hint="Definem a faixa ideal usada para classificar cada medição e gerar alertas.">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
+      <Section title="Limites de pH" hint="Definem a faixa ideal usada para classificar cada medição e gerar alertas.">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {FIELDS.map(f => (
             <Field key={f.key} label={f.label} value={values[f.key] ?? ''} onChange={v => update(f.key, v)} hint={f.hint} />
           ))}
         </div>
+        <button
+          onClick={handleRestoreDefaults}
+          disabled={restoringDefaults || saving}
+          className="px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-60"
+          style={{ background: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+        >
+          {restoringDefaults ? 'Restaurando…' : 'Restaurar padrões de pH'}
+        </button>
       </Section>
 
       {errors.length > 0 && (
@@ -156,7 +182,7 @@ export default function Configuracoes() {
       <div className="flex items-center gap-4">
         <button
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || restoringDefaults}
           className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-60"
           style={{
             background: saved ? 'rgba(34,211,238,0.15)' : 'rgba(6,182,212,0.9)',
